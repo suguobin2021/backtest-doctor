@@ -44,3 +44,8 @@ its packaging dependencies can be downloaded during installation.
 
 **Limits:** the action checks exported CSV fields, not trading strategies or
 alpha source code. A PASS is not proof of causality or future profitability.
+
+## Optional mapped CSV columns
+
+Supply columns-file: examples/columns_synthetic.json to map alternate CSV headings.
+See the column mapping guide; never send private trading data to hosted CI without authorization.
