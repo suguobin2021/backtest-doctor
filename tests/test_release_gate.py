@@ -51,7 +51,7 @@ class ReleaseGuardTests(unittest.TestCase):
                 gate._dist_members_wheel(path, HERE)
 
     def test_release_allowlist_has_no_duplicate(self):
-        self.assertEqual(len(gate.EXPECTED_TRACKED), 33)
+        self.assertEqual(len(gate.EXPECTED_TRACKED), 35)
         self.assertTrue(all(name.startswith('examples/') for name in gate.EXPECTED_TRACKED if name.endswith('.csv')))
 
 if __name__=='__main__':
