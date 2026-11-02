@@ -1,0 +1,4 @@
+Entry Timestamp,Exit Timestamp,Return,Status,Direction
+2026-01-01T00:00:00Z,2026-01-04T00:00:00Z,0.02,Closed,Long
+2026-02-01T00:00:00Z,2026-02-04T00:00:00Z,-0.01,Closed,Short
+2026-03-01T00:00:00Z,2026-03-04T00:00:00Z,0.015,Closed,Long

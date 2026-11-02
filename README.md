@@ -39,7 +39,17 @@ For a **complete cross-platform, beginner-friendly walkthrough**, follow [the sy
 
 For CI integration in other repositories, see the [experimental GitHub Action](docs/ACTION_USAGE.md).
 
-For synthetic examples of alternate CSV column names, see [declarative column mapping](docs/COLUMN_MAPPING.md).
+**NEW: experimental framework-export CSV adapters:** inspect settled trade summaries from `backtesting.py`, `vectorbt`, or a manually prepared Freqtrade CSV subset (not native Freqtrade ZIP/JSON):
+
+```sh
+python -m backtest_doctor import-trades examples/backtesting_py_synthetic.csv --framework backtesting-py
+python -m backtest_doctor import-trades examples/vectorbt_synthetic.csv --framework vectorbt
+python -m backtest_doctor import-trades examples/freqtrade_csv_synthetic.csv --framework freqtrade-csv
+```
+
+These checks cannot verify causal signal timing, and they do not double-count framework-reported costs by default. See [framework CSV contracts, known limits and privacy model](docs/FRAMEWORK_TRADES.md).
+
+For synthetic examples of alternate CSV column names (without copying any private exports), see [declarative column mapping](docs/COLUMN_MAPPING.md).
 
 ## Checks
 

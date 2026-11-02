@@ -36,6 +36,8 @@ jobs:
         run: python -m backtest_doctor --version
       - name: Redacted audit smoke
         run: python -m backtest_doctor ohlcv examples/ohlcv_good.csv
+      - name: Experimental framework trade CSV adapter smoke
+        run: python -m backtest_doctor import-trades examples/vectorbt_synthetic.csv --framework vectorbt
 
   action-smoke:
     name: Composite action / synthetic-only smoke
@@ -52,10 +54,14 @@ jobs:
           stability-file: examples/stability_demo.csv
           fail-on-warn: 'false'
           html-report: synthetic-action-report.html
-      - name: Check synthetic aliased columns
+      - name: Check synthetic aliased columns in standalone CLI
         shell: bash
         run: |
-          python -m backtest_doctor bundle             --ohlcv-file examples/ohlcv_alias.csv             --ledger-file examples/ledger_alias.csv             --stability-file examples/stability_alias.csv             --columns examples/columns_synthetic.json
+          python -m backtest_doctor bundle \
+            --ohlcv-file examples/ohlcv_alias.csv \
+            --ledger-file examples/ledger_alias.csv \
+            --stability-file examples/stability_alias.csv \
+            --columns examples/columns_synthetic.json
       - name: Assert an offline HTML report was produced
         shell: bash
         run: |
