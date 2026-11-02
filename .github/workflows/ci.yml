@@ -1,6 +1,7 @@
 name: Synthetic-only compatibility tests
 on:
   push:
+    branches: [main]
   pull_request:
 permissions:
   contents: read
@@ -20,9 +21,13 @@ jobs:
           - {os: macos-latest, python-version: '3.11'}
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Verify public source allowlist
+        run: python tools/verify_release.py --source .
       - name: Install local package
         run: python -m pip install --no-deps .
       - name: Unit tests (synthetic-only)

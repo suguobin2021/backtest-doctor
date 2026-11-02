@@ -1,0 +1,79 @@
+name: Manually publish audited distribution to PyPI
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: 'Type PUBLISH to authorize PyPI upload; DRY_RUN for checks only'
+        required: true
+        type: string
+        default: 'DRY_RUN'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Build and verify tag-matched source
+    runs-on: ubuntu-latest
+    if: ${{ inputs.confirmation == 'DRY_RUN' || inputs.confirmation == 'PUBLISH' }}
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - id: version
+        name: Verify immutable tag matches package version
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os, pathlib, tomllib
+          version = tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']['version']
+          actual = os.environ['GITHUB_REF']
+          expected = f'refs/tags/v{version}'
+          if actual != expected:
+              raise SystemExit(f'FAIL: expected {expected}; got {actual}')
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as f:
+              f.write(f'version={version}\n')
+          print(f'Validated package tag v{version}')
+          PY
+      - name: Check source and run synthetic tests
+        run: |
+          python tools/verify_release.py --source .
+          python -m pip install --no-deps .
+          python -m unittest discover -s tests -v
+          python -m backtest_doctor ohlcv examples/ohlcv_good.csv
+      - name: Build reproducible package artifacts
+        run: |
+          python -m pip install build
+          python -m build --sdist --wheel --outdir dist
+          python tools/verify_release.py --source . --dist dist
+      - name: Make artifacts available to publish job
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-distributions
+          path: dist/*
+          retention-days: 1
+
+  publish:
+    name: Publish to PyPI using OIDC
+    needs: verify
+    if: ${{ inputs.confirmation == 'PUBLISH' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/backtest-doctor
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-distributions
+          path: dist/
+      - name: Publish without persistent credentials
+        uses: pypa/gh-action-pypi-publish@release/v1
