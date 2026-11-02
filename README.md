@@ -22,7 +22,7 @@ python -m pip install .
 python -m backtest_doctor --help
 ```
 
-## 30-second demo
+## 30-second synthetic demo
 
 ```sh
 # Run from the repository root; ALL sample files are synthetic.
@@ -33,7 +33,9 @@ python -m backtest_doctor bundle \
   --html doctor-report.html --fail-on-warn
 ```
 
-Try `examples/ledger_good.csv` instead of the bad ledger to see a clean causal timing check. Stability may still return `WARN` for small samples. The command exits `0` for PASS, `1` for FAIL (and WARN with `--fail-on-warn`), and `2` for rejected input. For an HTML report opened locally, use a **new filename**; the CLI will not overwrite an existing file.
+The intentionally bad ledger produces `FAIL` and exits **1**; this is expected, not an installation failure. Try `examples/ledger_good.csv` instead to see a clean causal timing check. Stability may still return `WARN` for small samples. The command exits `0` for PASS, `1` for FAIL (and WARN with `--fail-on-warn`), and `2` for rejected input. For an HTML report opened locally, use a **new filename**; the CLI will not overwrite an existing file.
+
+For a **complete cross-platform, beginner-friendly walkthrough**, follow [the synthetic quickstart](docs/QUICKSTART.md). For the manual, secretless PyPI publishing process, see [the distribution guide](docs/PYPI_PUBLISHING.md).
 
 ## Checks
 
