@@ -1,20 +1,33 @@
-# PyPI publishing: guarded, manual, no permanent tokens
+# PyPI publishing via Trusted Publisher (no permanent tokens)
 
-**Current state:** PyPI publication is not part of the GitHub prerelease. Do not promise `pip install backtest-doctor` until the PyPI project page and an installation from that index have been independently verified.
+## Verified first publication — 2026-11-03
 
-The repository contains a guarded workflow `.github/workflows/publish-pypi.yml`. It never runs from ordinary pushes or PRs. It requires manual execution against a matching `vX.Y.Z` **Git tag**, an explicit `PUBLISH` acknowledgement, a successful source/artifact gate, and a GitHub Environment named `pypi`. It uses OIDC Trusted Publishing rather than credentials placed in repository secrets or files.
+**Backtest Doctor 0.4.0rc4 is available on PyPI as a prerelease.** It was uploaded from the immutable `v0.4.0rc4` tag using `.github/workflows/publish-pypi.yml` and the `pypi` environment, with GitHub OIDC rather than permanent API keys.
 
-## One-time setup by the PyPI account owner
+The [official publishing run](https://github.com/suguobin2021/backtest-doctor/actions/runs/41543443737) succeeded. Both PyPI artifacts were downloaded from the public index, their SHA256 hashes verified, and their code compared with the exact public Git tag commit `d45ca5ea63ff96f3d1c67a96a00984b368cb24d8`. Public-source and distribution allowlist checks passed. Isolated installs and synthetic smoke tests passed on Linux Python 3.10 and Python 3.12.
 
-1. Sign in to [PyPI](https://pypi.org/), preferably with two-factor authentication, and create a pending publisher for package `backtest-doctor`, **if that name is available**.
-2. Set **Owner** = `suguobin2021`, **Repository** = `backtest-doctor`, **Workflow filename** = `publish-pypi.yml`, and **Environment name** = `pypi` (exactly).
-3. In GitHub repository settings, create the environment `pypi` with release branch/tag restrictions as appropriate and required reviewer protection if available. Never create a PyPI long-lived token just for this workflow.
-4. Prepare a **new** version tag from reviewed and CI-green source. Do not republish or move `v0.4.0rc1` and do not tag an unreviewed commit.
-5. Run the workflow manually on that tag, enter `PUBLISH`, and inspect the release checks and upload logs. A no-op dry run can instead use `DRY_RUN`.
-6. After publication, verify the package name, project owner, files and SHA256 on PyPI, then install it in a fresh environment on at least two Python versions and run the synthetic demos. Only then update README.
+To install this **prerelease** (requires Python 3.10+):
 
-**Critical:** adding the workflow does not enroll a PyPI publisher, set up GitHub environment protections, or prove domain/package ownership. These are separate account-level actions. Never claim that a failed upload is a successful publication.
+```sh
+python -m pip install --pre "backtest-doctor==0.4.0rc4"
+python -m backtest_doctor --version
+```
 
-Official references:
+Project: https://pypi.org/project/backtest-doctor/0.4.0rc4/
+
+Do **not** claim that a stable `0.4.0` is already available. The framework CSV adapters remain experimental and no real account data or proprietary datasets were used.
+
+## Future releases
+
+1. Review a public-only PR, the exact source change set, security allowlist, and synthetic cross-platform CI.
+2. Update `pyproject.toml` and `src/backtest_doctor/__init__.py` consistently. Create a **new**, immutable tag matching the version; never re-use a version or move an existing tag.
+3. Use the existing `publish-pypi.yml` workflow on that tag with `DRY_RUN` first. Use `PUBLISH` only after the specific artifacts and target have been approved.
+4. Retain the GitHub `pypi` Environment, PyPI Trusted Publisher, and per-job `id-token: write`; do not store PyPI secrets in the repository.
+5. Independently inspect PyPI hashes, distribution content, and fresh installations on at least two supported Python versions after every release.
+
+GitHub Environment required-reviewer protection and tag restrictions are recommended, but **were not independently confirmed enabled**. Publishing a final `0.4.0` also requires stability review of the experimental adapters.
+
+Official docs:
 - https://docs.pypi.org/trusted-publishers/using-a-publisher/
+- https://docs.pypi.org/trusted-publishers/creating-a-project-through-oidc/
 - https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/

@@ -9,18 +9,21 @@
 
 ## Install
 
-Requires Python 3.10+. After the package is published to PyPI:
+Requires Python 3.10+. The current PyPI distribution is a **prerelease**, not a stable release. Install the verified version explicitly:
 
 ```sh
-python -m pip install backtest-doctor
+python -m pip install --pre "backtest-doctor==0.4.0rc4"
+python -m backtest_doctor --version
 ```
 
-Until PyPI publication, install the wheel from a verified release artifact or install this repository from source:
+Alternatively, install from the [audited GitHub Release](https://github.com/suguobin2021/backtest-doctor/releases/tag/v0.4.0rc4) or from this source checkout:
 
 ```sh
 python -m pip install .
 python -m backtest_doctor --help
 ```
+
+[PyPI project](https://pypi.org/project/backtest-doctor/0.4.0rc4/) · [Distribution guidance](docs/PYPI_PUBLISHING.md).
 
 ## 30-second synthetic demo
 

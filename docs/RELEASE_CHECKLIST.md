@@ -6,7 +6,7 @@
 - [x] No access to or copying from private private trading, exchange-data, or research databases.
 - [x] A clean, new history is prepared; no private repository history is imported.
 - [x] Source + sdist + wheel allowlist checks, secret/path scans, no network/runtime-code-execution AST gate.
-- [x] Public GitHub tree and v0.4.0rc1 prerelease were independently verified on 2026-11-02.
+- [x] Public GitHub tree and v0.4.0rc4 prerelease were independently verified on 2026-11-02.
 - [ ] Enable GitHub branch protection (requires repository administrator setting).
 
 ## Compatibility
@@ -18,17 +18,17 @@
 ## Distribution
 
 - [x] GitHub repo created and initial audited public-source commit pushed.
-- [x] v0.4.0rc1 GitHub prerelease attached to audited commit.
-- [ ] PyPI package ownership/name availability checked by authenticated publisher.
-- [ ] PyPI trusted publishing configured for exact repo/workflow before uploading.
-- [ ] Only after a verified package URL exists, change README install instruction from conditional to unconditional.
+- [x] v0.4.0rc4 GitHub prerelease attached to audited commit.
+- [x] PyPI 0.4.0rc4 published and listed by the public Simple API.
+- [x] PyPI OIDC trusted publishing confirmed by successful GitHub Actions upload.
+- [x] README now documents the verified PyPI prerelease with explicit --pre installation.
 
 GitHub publication and PyPI publication are separate milestones. Fail closed: no credential disclosure, no auto-publish via personal access tokens embedded in config.
 
 ## New P0 gates
 
 - [ ] Publish stable package only from a reviewed matching Git tag.
-- [ ] PyPI Trusted Publisher registered by account owner (no long-lived token).
-- [ ] PyPI published files and independent installation inspected.
+- [x] PyPI Trusted Publisher activated by first successful upload, with no long-lived token.
+- [x] PyPI wheel/sdist independently checked; installed on Python 3.10 and 3.12.
 - [x] Offline source allowlist + wheel/sdist content gate implemented in `tools/verify_release.py`.
 - [x] Beginner synthetic guide added in `docs/QUICKSTART.md`.
