@@ -1,0 +1,70 @@
+# Backtest Doctor
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](pyproject.toml)
+
+**An offline, zero-runtime-dependency integrity check for exported backtests.** Validate timestamped OHLCV data, declared signal-to-fill timing, and how aggregate trade returns change under transaction costs. Produce deterministic, minimal JSON and self-contained HTML reports without including raw trades or filenames.
+
+> This tool checks the evidence you supply. It does **not** inspect or execute strategy source code; it cannot prove a strategy is free of look-ahead bias, overfitting, survivorship bias, or execution risk. `PASS` means only that the implemented checks found no violations in the supplied fields.
+
+## Install
+
+Requires Python 3.10+. After the package is published to PyPI:
+
+```sh
+python -m pip install backtest-doctor
+```
+
+Until PyPI publication, install the wheel from a verified release artifact or install this repository from source:
+
+```sh
+python -m pip install .
+python -m backtest_doctor --help
+```
+
+## 30-second demo
+
+```sh
+# Run from the repository root; ALL sample files are synthetic.
+python -m backtest_doctor bundle \
+  --ohlcv-file examples/ohlcv_good.csv \
+  --ledger-file examples/ledger_bad.csv \
+  --stability-file examples/stability_demo.csv \
+  --html doctor-report.html --fail-on-warn
+```
+
+Try `examples/ledger_good.csv` instead of the bad ledger to see a clean causal timing check. Stability may still return `WARN` for small samples. The command exits `0` for PASS, `1` for FAIL (and WARN with `--fail-on-warn`), and `2` for rejected input. For an HTML report opened locally, use a **new filename**; the CLI will not overwrite an existing file.
+
+## Checks
+
+| Mode | Input | Detects / summarizes |
+| --- | --- | --- |
+| `ohlcv` | CSV with `timestamp,open,high,low,close,volume` | Invalid candle geometry, duplicate/non-monotone timestamps, irregular cadence (when configured) |
+| `ledger` | CSV with `signal_bar_close,entry_time,next_bar_open` | Entry before or at signal close; entry before claimed next bar; both stop and target hit within the same bar |
+| `stability` | CSV with `exit_time,gross_return` | Trade count, time-coverage warnings, cost-scenario expectancy, PF, win rate, simplified sequential equity/drawdown proxies |
+| `bundle` | All three CSVs | All checks, one aggregate report and exit status |
+
+Single-mode invocation:
+
+```sh
+python -m backtest_doctor ohlcv examples/ohlcv_good.csv --interval-seconds 60
+python -m backtest_doctor ledger examples/ledger_bad.csv
+python -m backtest_doctor stability examples/stability_demo.csv
+```
+
+**Profit factor is undefined (reported as `null`) if no negative trades exist.** All stability returns are fractions: `0.01` means 1%. Compounded returns and drawdown are explicitly **proxies**, not portfolio NAV or account-level PnL. Overlapping trades, leverage, funding, slippage, execution limits and corporate actions are not reconstructed. Costs are specified in basis points per trade (default 0, 8, 20 bps).
+
+## Privacy model
+
+No networking, telemetry, trade execution, or strategy source evaluation. Reads local regular CSV files only (up to 10 MiB, 100,000 rows) and emits aggregate metrics and coded findings only. It is intentionally **not a security sandbox**: do not use it to evaluate untrusted adversarial filesystem access, and inspect reports before sharing. See [SECURITY.md](SECURITY.md).
+
+This repo uses synthetic fixtures only. It has no live trading records, private quantitative research databases, exchange API keys, real account IDs, strategy-specific parameters, server credentials, or licensed market datasets. Only explicitly allowlisted code, docs, tests, and synthetic fixtures are bundled by the build process.
+
+## Contribute and reproducibility
+
+```sh
+python -m unittest discover -s tests -v
+python -m pip wheel . --no-deps -w dist
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md), [docs/LIMITATIONS.md](docs/LIMITATIONS.md), and [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md). MIT-licensed. No claim of investment performance or financial advice.
