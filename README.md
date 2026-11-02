@@ -39,6 +39,8 @@ For a **complete cross-platform, beginner-friendly walkthrough**, follow [the sy
 
 For CI integration in other repositories, see the [experimental GitHub Action](docs/ACTION_USAGE.md).
 
+For synthetic examples of alternate CSV column names, see [declarative column mapping](docs/COLUMN_MAPPING.md).
+
 ## Checks
 
 | Mode | Input | Detects / summarizes |

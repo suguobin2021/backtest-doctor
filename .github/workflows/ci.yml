@@ -52,6 +52,10 @@ jobs:
           stability-file: examples/stability_demo.csv
           fail-on-warn: 'false'
           html-report: synthetic-action-report.html
+      - name: Check synthetic aliased columns
+        shell: bash
+        run: |
+          python -m backtest_doctor bundle             --ohlcv-file examples/ohlcv_alias.csv             --ledger-file examples/ledger_alias.csv             --stability-file examples/stability_alias.csv             --columns examples/columns_synthetic.json
       - name: Assert an offline HTML report was produced
         shell: bash
         run: |

@@ -10,6 +10,7 @@ from . import __version__
 from .audit import audit_ledger, audit_ohlcv, audit_stability, read_csv
 from .bundle import audit_bundle
 from .report import render_html
+from .schema import load_columns, normalize_rows
 
 
 def _save_new_report(path, content):
@@ -39,23 +40,25 @@ def main(argv=None):
     parser.add_argument('--stability-file', type=Path)
     parser.add_argument('--interval-seconds', type=int)
     parser.add_argument('--html', type=Path, help='Create a privacy-minimal HTML report, without overwrite')
+    parser.add_argument('--columns', type=Path, help='Local JSON canonical-to-source aliases')
     parser.add_argument('--fail-on-warn', action='store_true', help='Exit 1 for WARN as well as FAIL (CI mode)')
     args = parser.parse_args(argv)
     try:
+        columns = load_columns(args.columns) if args.columns is not None else {}
         if args.mode == 'bundle':
             if (args.file is not None or args.ohlcv_file is None or args.ledger_file is None
                     or args.stability_file is None):
                 raise ValueError('bundle requires three named inputs and no positional file')
             report = audit_bundle(
-                ohlcv_rows=read_csv(args.ohlcv_file),
-                ledger_rows=read_csv(args.ledger_file),
-                stability_rows=read_csv(args.stability_file),
+                ohlcv_rows=normalize_rows(read_csv(args.ohlcv_file), 'ohlcv', columns),
+                ledger_rows=normalize_rows(read_csv(args.ledger_file), 'ledger', columns),
+                stability_rows=normalize_rows(read_csv(args.stability_file), 'stability', columns),
                 interval_seconds=args.interval_seconds,
             )
         else:
             if args.file is None or any((args.ohlcv_file, args.ledger_file, args.stability_file)):
                 raise ValueError('invalid input selection')
-            rows = read_csv(args.file)
+            rows = normalize_rows(read_csv(args.file), args.mode, columns)
             if args.mode == 'ohlcv':
                 report = audit_ohlcv(rows, args.interval_seconds)
             elif args.mode == 'ledger':
