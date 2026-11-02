@@ -1,0 +1,5 @@
+{
+  "ohlcv": {"timestamp":"Date","open":"Open","high":"High","low":"Low","close":"Close","volume":"Volume"},
+  "ledger": {"signal_bar_close":"SignalClose","next_bar_open":"NextOpen","entry_time":"Entered"},
+  "stability": {"exit_time":"Exited","gross_return":"GrossReturn"}
+}
