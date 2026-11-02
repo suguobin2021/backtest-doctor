@@ -1,70 +1,43 @@
-name: Publish audited GitHub prerelease
+name: Bootstrap one audited PyPI prerelease via OIDC
+
 on:
   push:
     branches: [main]
     paths:
       - .github/workflows/publish-rc.yml
+
 permissions:
-  contents: write
+  actions: write
+  contents: read
+
 jobs:
-  publish:
+  dispatch-first-pypi:
+    name: Dispatch immutable tag v0.4.0rc4 once
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Match immutable release version to checked-out code
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          import tomllib
-          from pathlib import Path
-          from importlib.util import spec_from_file_location, module_from_spec
-          metadata = tomllib.loads(Path('pyproject.toml').read_text())
-          target = '0.4.0rc4'
-          assert metadata['project']['version'] == target
-          spec = spec_from_file_location('doctor_version', 'src/backtest_doctor/__init__.py')
-          obj = module_from_spec(spec); spec.loader.exec_module(obj)
-          assert obj.__version__ == target
-          print('RELEASE_VERSION_MATCH=PASS;VERSION=' + target)
-          PY
-      - name: Verify only public and synthetic source is tracked
-        run: python tools/verify_release.py --source .
-      - name: Build, test and inspect release artifacts
-        shell: bash
-        run: |
-          set -euo pipefail
-          python -m pip install --upgrade build
-          python -m build --sdist --wheel --outdir dist
-          python tools/verify_release.py --source . --dist dist
-          python -m pip install --no-deps dist/*.whl
-          python -m unittest discover -s tests -q
-          python -m backtest_doctor --version
-          python -m backtest_doctor bundle --ohlcv-file examples/ohlcv_alias.csv --ledger-file examples/ledger_alias.csv --stability-file examples/stability_alias.csv --columns examples/columns_synthetic.json
-          python -m backtest_doctor import-trades examples/backtesting_py_synthetic.csv --framework backtesting-py
-          python -m backtest_doctor import-trades examples/vectorbt_synthetic.csv --framework vectorbt
-          python -m backtest_doctor import-trades examples/freqtrade_csv_synthetic.csv --framework freqtrade-csv
-          python -m backtest_doctor bundle --ohlcv-file examples/ohlcv_good.csv --ledger-file examples/ledger_good.csv --stability-file examples/stability_demo.csv --explain --html synthetic-release-guide.html
-          test -s synthetic-release-guide.html
-          grep -q 'How to investigate' synthetic-release-guide.html
-      - name: Publish v0.4.0rc4 from this exact audited commit
+      - name: Validate exact repository and signed-off release tag
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          if gh release view v0.4.0rc4 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo 'Release tag already exists: manual review required' >&2
+          test "$GITHUB_REPOSITORY" = 'suguobin2021/backtest-doctor'
+          tag='v0.4.0rc4'
+          expected_sha='d45ca5ea63ff96f3d1c67a96a00984b368cb24d8'
+          actual_sha="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq '.object.sha')"
+          test "$actual_sha" = "$expected_sha"
+          status="$(curl --silent --show-error --location --max-time 15 --output /dev/null --write-out '%{http_code}' https://pypi.org/pypi/backtest-doctor/json)"
+          if [ "$status" = '200' ]; then
+            echo 'PyPI project already exists: no automatic repeat upload.'
+            exit 0
+          fi
+          if [ "$status" != '404' ]; then
+            echo 'PyPI availability was not confirmed; refusing to dispatch.'
             exit 1
           fi
-          gh release create v0.4.0rc4 dist/*.whl dist/*.tar.gz \
+          gh workflow run publish-pypi.yml \
             --repo "$GITHUB_REPOSITORY" \
-            --target "$GITHUB_SHA" \
-            --prerelease \
-            --title 'Backtest Doctor v0.4.0rc4' \
-            --notes 'Opt-in data-free diagnostic explanations, synthetic-only examples, and experimental backtesting.py, vectorbt and prepared Freqtrade CSV adapters. No private research data. Findings are not proof of causality or profitability.'
+            --ref "$tag" \
+            --field confirmation=PUBLISH
+          echo 'PYPI_DISPATCH_REQUESTED=YES'
