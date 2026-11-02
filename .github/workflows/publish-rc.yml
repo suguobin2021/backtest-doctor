@@ -26,7 +26,7 @@ jobs:
           from pathlib import Path
           from importlib.util import spec_from_file_location, module_from_spec
           metadata = tomllib.loads(Path('pyproject.toml').read_text())
-          target = '0.4.0rc3'
+          target = '0.4.0rc4'
           assert metadata['project']['version'] == target
           spec = spec_from_file_location('doctor_version', 'src/backtest_doctor/__init__.py')
           obj = module_from_spec(spec); spec.loader.exec_module(obj)
@@ -49,19 +49,22 @@ jobs:
           python -m backtest_doctor import-trades examples/backtesting_py_synthetic.csv --framework backtesting-py
           python -m backtest_doctor import-trades examples/vectorbt_synthetic.csv --framework vectorbt
           python -m backtest_doctor import-trades examples/freqtrade_csv_synthetic.csv --framework freqtrade-csv
-      - name: Publish v0.4.0rc3 from this exact audited commit
+          python -m backtest_doctor bundle --ohlcv-file examples/ohlcv_good.csv --ledger-file examples/ledger_good.csv --stability-file examples/stability_demo.csv --explain --html synthetic-release-guide.html
+          test -s synthetic-release-guide.html
+          grep -q 'How to investigate' synthetic-release-guide.html
+      - name: Publish v0.4.0rc4 from this exact audited commit
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          if gh release view v0.4.0rc3 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          if gh release view v0.4.0rc4 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo 'Release tag already exists: manual review required' >&2
             exit 1
           fi
-          gh release create v0.4.0rc3 dist/*.whl dist/*.tar.gz \
+          gh release create v0.4.0rc4 dist/*.whl dist/*.tar.gz \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
             --prerelease \
-            --title 'Backtest Doctor v0.4.0rc3' \
-            --notes 'Experimental offline trade CSV adapters for backtesting.py, vectorbt, and manually prepared Freqtrade CSV subsets. Synthetic-only fixtures, no native archives or private research data. These checks cannot verify causality or real portfolio profitability.'
+            --title 'Backtest Doctor v0.4.0rc4' \
+            --notes 'Opt-in data-free diagnostic explanations, synthetic-only examples, and experimental backtesting.py, vectorbt and prepared Freqtrade CSV adapters. No private research data. Findings are not proof of causality or profitability.'
