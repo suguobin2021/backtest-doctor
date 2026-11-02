@@ -22,6 +22,7 @@ jobs:
           ledger-file: examples/ledger_good.csv
           stability-file: examples/stability_demo.csv
           fail-on-warn: 'false'
+          explain: 'true'
 ```
 
 Replace the example paths with CSV files that match the documented schemas.
@@ -41,6 +42,8 @@ aggregate statistics and row numbers. Do not run this on sensitive private
 trade files unless your own data-handling policy permits processing on that
 runner. The CLI itself does not transmit trade records or API requests, but
 its packaging dependencies can be downloaded during installation.
+
+Set `explain: 'true'` to include fixed, data-free descriptions and next steps in aggregate results. These suggestions do not validate strategy profitability. See [finding codes](FINDING_CODES.md).
 
 **Limits:** the action checks exported CSV fields, not trading strategies or
 alpha source code. A PASS is not proof of causality or future profitability.

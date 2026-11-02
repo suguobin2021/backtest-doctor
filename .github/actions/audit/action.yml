@@ -14,6 +14,10 @@ inputs:
     description: Optional local JSON alias map in the caller repository
     required: false
     default: ''
+  explain:
+    description: Include fixed, data-free finding explanations
+    required: false
+    default: 'false'
   fail-on-warn:
     description: If true, treat diagnostic WARN status as a failing exit code
     required: false
@@ -42,6 +46,7 @@ runs:
         INPUT_STABILITY: ${{ inputs.stability-file }}
         INPUT_COLUMNS: ${{ inputs.columns-file }}
         INPUT_FAIL_ON_WARN: ${{ inputs.fail-on-warn }}
+        INPUT_EXPLAIN: ${{ inputs.explain }}
         INPUT_HTML: ${{ inputs.html-report }}
       run: |
         set -euo pipefail
@@ -49,8 +54,13 @@ runs:
           echo 'FAIL: fail-on-warn must be true or false' >&2
           exit 2
         fi
+        if [[ "$INPUT_EXPLAIN" != 'true' && "$INPUT_EXPLAIN" != 'false' ]]; then
+          echo 'FAIL: explain must be true or false' >&2
+          exit 2
+        fi
         args=(bundle --ohlcv-file "$INPUT_OHLCV" --ledger-file "$INPUT_LEDGER" --stability-file "$INPUT_STABILITY")
         if [[ -n "$INPUT_COLUMNS" ]]; then args+=(--columns "$INPUT_COLUMNS"); fi
+        if [[ "$INPUT_EXPLAIN" == 'true' ]]; then args+=(--explain); fi
         if [[ "$INPUT_FAIL_ON_WARN" == 'true' ]]; then args+=(--fail-on-warn); fi
         if [[ -n "$INPUT_HTML" ]]; then args+=(--html "$INPUT_HTML"); fi
         python -m backtest_doctor "${args[@]}"

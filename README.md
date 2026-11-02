@@ -39,6 +39,8 @@ For a **complete cross-platform, beginner-friendly walkthrough**, follow [the sy
 
 For CI integration in other repositories, see the [experimental GitHub Action](docs/ACTION_USAGE.md).
 
+Add `--explain` to any audit command for **fixed, data-free diagnostic explanations and investigation suggestions**. Explanations are opt-in, preserving the default JSON format. See the [finding guide](docs/FINDING_CODES.md).
+
 **NEW: experimental framework-export CSV adapters:** inspect settled trade summaries from `backtesting.py`, `vectorbt`, or a manually prepared Freqtrade CSV subset (not native Freqtrade ZIP/JSON):
 
 ```sh
