@@ -1,0 +1,47 @@
+name: Publish audited GitHub prerelease
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/publish-rc.yml
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out immutable audited source
+        uses: actions/checkout@v4
+        with:
+          ref: c643845d41beaeda5ac990337ee7cd2aed4ec4cc
+          persist-credentials: false
+      - name: Use Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build and test audited source
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade build
+          python -m build --sdist --wheel --outdir dist
+          python -m pip install --no-deps dist/*.whl
+          python -m unittest discover -s tests -q
+          python -m backtest_doctor --version
+      - name: Create v0.4.0rc1 GitHub prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view v0.4.0rc1 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release already exists; leaving it unchanged."
+            exit 0
+          fi
+          gh release create v0.4.0rc1 dist/*.whl dist/*.tar.gz \
+            --repo "$GITHUB_REPOSITORY" \
+            --target c643845d41beaeda5ac990337ee7cd2aed4ec4cc \
+            --prerelease \
+            --title "Backtest Doctor v0.4.0rc1" \
+            --notes "First public prerelease of the offline Backtest Doctor audit CLI. Synthetic-only fixtures. Audits OHLCV data integrity, declared trade timing, and aggregate stability under transaction costs. This tool does not prove strategies are free of bias. GitHub source commit: c643845d41beaeda5ac990337ee7cd2aed4ec4cc."
