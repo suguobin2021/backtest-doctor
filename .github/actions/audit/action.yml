@@ -10,6 +10,10 @@ inputs:
   stability-file:
     description: Path to settled-return CSV in the caller repository
     required: true
+  columns-file:
+    description: Optional local JSON alias map in the caller repository
+    required: false
+    default: ''
   fail-on-warn:
     description: If true, treat diagnostic WARN status as a failing exit code
     required: false
@@ -36,6 +40,7 @@ runs:
         INPUT_OHLCV: ${{ inputs.ohlcv-file }}
         INPUT_LEDGER: ${{ inputs.ledger-file }}
         INPUT_STABILITY: ${{ inputs.stability-file }}
+        INPUT_COLUMNS: ${{ inputs.columns-file }}
         INPUT_FAIL_ON_WARN: ${{ inputs.fail-on-warn }}
         INPUT_HTML: ${{ inputs.html-report }}
       run: |
@@ -45,6 +50,7 @@ runs:
           exit 2
         fi
         args=(bundle --ohlcv-file "$INPUT_OHLCV" --ledger-file "$INPUT_LEDGER" --stability-file "$INPUT_STABILITY")
+        if [[ -n "$INPUT_COLUMNS" ]]; then args+=(--columns "$INPUT_COLUMNS"); fi
         if [[ "$INPUT_FAIL_ON_WARN" == 'true' ]]; then args+=(--fail-on-warn); fi
         if [[ -n "$INPUT_HTML" ]]; then args+=(--html "$INPUT_HTML"); fi
         python -m backtest_doctor "${args[@]}"
