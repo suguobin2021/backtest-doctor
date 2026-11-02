@@ -1,0 +1,50 @@
+name: Backtest Doctor - synthetic or user-supplied CSV audit
+description: Offline bundle audit of OHLCV, declared trade timing, and trade-return stability
+inputs:
+  ohlcv-file:
+    description: Path to OHLCV CSV in the checked-out caller repository
+    required: true
+  ledger-file:
+    description: Path to trade-timing CSV in the caller repository
+    required: true
+  stability-file:
+    description: Path to settled-return CSV in the caller repository
+    required: true
+  fail-on-warn:
+    description: If true, treat diagnostic WARN status as a failing exit code
+    required: false
+    default: 'false'
+  html-report:
+    description: Optional NEW path for a self-contained offline HTML report; never overwrites
+    required: false
+    default: ''
+runs:
+  using: composite
+  steps:
+    - name: Python for the offline auditing CLI
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install action's exact checked-out package source
+      shell: bash
+      run: |
+        set -euo pipefail
+        python -m pip install --no-deps --disable-pip-version-check "$GITHUB_ACTION_PATH/../../.."
+    - name: Audit data without sending the CSV files to a service
+      shell: bash
+      env:
+        INPUT_OHLCV: ${{ inputs.ohlcv-file }}
+        INPUT_LEDGER: ${{ inputs.ledger-file }}
+        INPUT_STABILITY: ${{ inputs.stability-file }}
+        INPUT_FAIL_ON_WARN: ${{ inputs.fail-on-warn }}
+        INPUT_HTML: ${{ inputs.html-report }}
+      run: |
+        set -euo pipefail
+        if [[ "$INPUT_FAIL_ON_WARN" != 'true' && "$INPUT_FAIL_ON_WARN" != 'false' ]]; then
+          echo 'FAIL: fail-on-warn must be true or false' >&2
+          exit 2
+        fi
+        args=(bundle --ohlcv-file "$INPUT_OHLCV" --ledger-file "$INPUT_LEDGER" --stability-file "$INPUT_STABILITY")
+        if [[ "$INPUT_FAIL_ON_WARN" == 'true' ]]; then args+=(--fail-on-warn); fi
+        if [[ -n "$INPUT_HTML" ]]; then args+=(--html "$INPUT_HTML"); fi
+        python -m backtest_doctor "${args[@]}"
