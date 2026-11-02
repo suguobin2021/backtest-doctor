@@ -11,37 +11,54 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Check out immutable audited source
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          ref: c643845d41beaeda5ac990337ee7cd2aed4ec4cc
           persist-credentials: false
-      - name: Use Python 3.12
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Build and test audited source
+      - name: Match immutable release version to checked-out code
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import tomllib
+          from pathlib import Path
+          from importlib.util import spec_from_file_location, module_from_spec
+          metadata = tomllib.loads(Path('pyproject.toml').read_text())
+          target = '0.4.0rc2'
+          assert metadata['project']['version'] == target
+          spec = spec_from_file_location('doctor_version', 'src/backtest_doctor/__init__.py')
+          obj = module_from_spec(spec); spec.loader.exec_module(obj)
+          assert obj.__version__ == target
+          print('RELEASE_VERSION_MATCH=PASS;VERSION=' + target)
+          PY
+      - name: Verify only public and synthetic source is tracked
+        run: python tools/verify_release.py --source .
+      - name: Build, test and inspect release artifacts
         shell: bash
         run: |
           set -euo pipefail
           python -m pip install --upgrade build
           python -m build --sdist --wheel --outdir dist
+          python tools/verify_release.py --source . --dist dist
           python -m pip install --no-deps dist/*.whl
           python -m unittest discover -s tests -q
           python -m backtest_doctor --version
-      - name: Create v0.4.0rc1 GitHub prerelease
+          python -m backtest_doctor bundle --ohlcv-file examples/ohlcv_alias.csv --ledger-file examples/ledger_alias.csv --stability-file examples/stability_alias.csv --columns examples/columns_synthetic.json
+      - name: Publish v0.4.0rc2 from this exact audited commit
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          if gh release view v0.4.0rc1 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "Release already exists; leaving it unchanged."
-            exit 0
+          if gh release view v0.4.0rc2 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'Release tag already exists: manual review required' >&2
+            exit 1
           fi
-          gh release create v0.4.0rc1 dist/*.whl dist/*.tar.gz \
+          gh release create v0.4.0rc2 dist/*.whl dist/*.tar.gz \
             --repo "$GITHUB_REPOSITORY" \
-            --target c643845d41beaeda5ac990337ee7cd2aed4ec4cc \
+            --target "$GITHUB_SHA" \
             --prerelease \
-            --title "Backtest Doctor v0.4.0rc1" \
-            --notes "First public prerelease of the offline Backtest Doctor audit CLI. Synthetic-only fixtures. Audits OHLCV data integrity, declared trade timing, and aggregate stability under transaction costs. This tool does not prove strategies are free of bias. GitHub source commit: c643845d41beaeda5ac990337ee7cd2aed4ec4cc."
+            --title 'Backtest Doctor v0.4.0rc2' \
+            --notes 'Offline CSV column aliases, synthetic-only regression tests, privacy-preserving diagnostics. Maps field names without interpreting framework semantics or sending data to any external service. No private research data. This prerelease does not prove trading profitability.'
