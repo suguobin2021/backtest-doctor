@@ -17,6 +17,7 @@ import zipfile
 from pathlib import Path, PurePosixPath
 
 EXPECTED_TRACKED = frozenset({
+    '.github/actions/audit/action.yml',
     '.github/workflows/ci.yml',
     '.github/workflows/publish-rc.yml',
     '.github/workflows/publish-pypi.yml',
@@ -26,6 +27,7 @@ EXPECTED_TRACKED = frozenset({
     'MANIFEST.in',
     'README.md',
     'SECURITY.md',
+    'docs/ACTION_USAGE.md',
     'docs/LIMITATIONS.md',
     'docs/QUICKSTART.md',
     'docs/PYPI_PUBLISHING.md',
