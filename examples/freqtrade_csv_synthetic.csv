@@ -1,0 +1,4 @@
+close_date,profit_ratio,is_open,pair
+2026-01-04T00:00:00Z,0.02,false,DEMO/USDT
+2026-02-04T00:00:00Z,-0.01,false,DEMO/USDT
+2026-03-04T00:00:00Z,0.015,false,DEMO/USDT

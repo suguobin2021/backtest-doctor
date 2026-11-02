@@ -11,6 +11,7 @@ from .audit import audit_ledger, audit_ohlcv, audit_stability, read_csv
 from .bundle import audit_bundle
 from .report import render_html
 from .schema import load_columns, normalize_rows
+from .adapters import FORMATS, audit_imported_trades
 
 
 def _save_new_report(path, content):
@@ -33,19 +34,28 @@ def _save_new_report(path, content):
 def main(argv=None):
     parser = argparse.ArgumentParser(prog='backtest-doctor', description='Offline CSV backtest audit; no strategy execution or telemetry')
     parser.add_argument('--version', action='version', version=__version__)
-    parser.add_argument('mode', choices=['ohlcv', 'ledger', 'stability', 'bundle'])
+    parser.add_argument('mode', choices=['ohlcv', 'ledger', 'stability', 'bundle', 'import-trades'])
     parser.add_argument('file', type=Path, nargs='?')
     parser.add_argument('--ohlcv-file', type=Path)
     parser.add_argument('--ledger-file', type=Path)
     parser.add_argument('--stability-file', type=Path)
     parser.add_argument('--interval-seconds', type=int)
+    parser.add_argument('--framework', choices=sorted(FORMATS), help='Trade export CSV dialect (import-trades only)')
+    parser.add_argument('--additional-cost-bps', type=float, default=0.0, help='Extra hypothetical cost stress for import-trades; 0 means no new fees')
     parser.add_argument('--html', type=Path, help='Create a privacy-minimal HTML report, without overwrite')
-    parser.add_argument('--columns', type=Path, help='Local JSON canonical-to-source aliases')
+    parser.add_argument('--columns', type=Path, help='Local JSON canonical-to-source column aliases')
     parser.add_argument('--fail-on-warn', action='store_true', help='Exit 1 for WARN as well as FAIL (CI mode)')
     args = parser.parse_args(argv)
     try:
         columns = load_columns(args.columns) if args.columns is not None else {}
-        if args.mode == 'bundle':
+        if args.mode != 'import-trades' and (args.framework is not None or args.additional_cost_bps != 0):
+            raise ValueError('framework settings require import-trades')
+        if args.mode == 'import-trades':
+            if (args.file is None or args.framework is None or args.columns is not None
+                    or args.interval_seconds is not None or any((args.ohlcv_file, args.ledger_file, args.stability_file))):
+                raise ValueError('import-trades requires CSV and framework only')
+            report = audit_imported_trades(read_csv(args.file), args.framework, args.additional_cost_bps)
+        elif args.mode == 'bundle':
             if (args.file is not None or args.ohlcv_file is None or args.ledger_file is None
                     or args.stability_file is None):
                 raise ValueError('bundle requires three named inputs and no positional file')
