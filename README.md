@@ -37,6 +37,8 @@ The intentionally bad ledger produces `FAIL` and exits **1**; this is expected, 
 
 For a **complete cross-platform, beginner-friendly walkthrough**, follow [the synthetic quickstart](docs/QUICKSTART.md). For the manual, secretless PyPI publishing process, see [the distribution guide](docs/PYPI_PUBLISHING.md).
 
+For CI integration in other repositories, see the [experimental GitHub Action](docs/ACTION_USAGE.md).
+
 ## Checks
 
 | Mode | Input | Detects / summarizes |
