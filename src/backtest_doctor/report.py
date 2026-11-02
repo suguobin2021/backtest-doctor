@@ -18,6 +18,12 @@ def render_html(report):
         escape(str(f['row']) if f['row'] is not None else '-')+'</td></tr>'
         for f in report['findings']
     )
+    explanations = report.get('explanations', [])
+    guide = ''.join(
+        '<section><h3>'+escape(str(item['code']))+'</h3><p>'+escape(str(item['meaning']))+
+        '</p><p><strong>Check:</strong> '+escape(str(item['next_step']))+'</p></section>'
+        for item in explanations
+    )
     metrics = escape(json.dumps(report['metrics'], ensure_ascii=False, indent=2, sort_keys=True, allow_nan=False))
     return ('''<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -45,6 +51,6 @@ small,.foot{color:#60738c}details{margin-bottom:32px}
 <div class="panel"><strong>'''+str(report['rows_examined'])+'''</strong><span>Rows examined</span></div></div>
 <h2>Sections</h2>'''+(''.join(parts) or '<p>No combined sections in this mode.</p>')+'''
 <h2>Evidence findings</h2><table><thead><tr><th>Mode</th><th>Code</th><th>Severity</th><th>Row</th></tr></thead><tbody>'''
-+rows+'''</tbody></table><h2>Aggregate metrics</h2><details><summary>Show summary data</summary><pre>'''+metrics+'''</pre></details>
++rows+'''</tbody></table>'''+('<h2>How to investigate</h2>'+guide if explanations else '')+'''<h2>Aggregate metrics</h2><details><summary>Show summary data</summary><pre>'''+metrics+'''</pre></details>
 <p class="foot">Input rows, filenames, identifiers, account data and strategy signals are excluded from the report.
 Metrics use simplifying assumptions. No external scripts, fonts, images or network requests.</p></main></body></html>''')

@@ -12,6 +12,7 @@ from .bundle import audit_bundle
 from .report import render_html
 from .schema import load_columns, normalize_rows
 from .adapters import FORMATS, audit_imported_trades
+from .explain import explain_findings
 
 
 def _save_new_report(path, content):
@@ -44,6 +45,7 @@ def main(argv=None):
     parser.add_argument('--additional-cost-bps', type=float, default=0.0, help='Extra hypothetical cost stress for import-trades; 0 means no new fees')
     parser.add_argument('--html', type=Path, help='Create a privacy-minimal HTML report, without overwrite')
     parser.add_argument('--columns', type=Path, help='Local JSON canonical-to-source column aliases')
+    parser.add_argument('--explain', action='store_true', help='Include data-free explanations for findings')
     parser.add_argument('--fail-on-warn', action='store_true', help='Exit 1 for WARN as well as FAIL (CI mode)')
     args = parser.parse_args(argv)
     try:
@@ -75,6 +77,8 @@ def main(argv=None):
                 report = audit_ledger(rows)
             else:
                 report = audit_stability(rows)
+        if args.explain:
+            explain_findings(report)
         if args.html is not None:
             _save_new_report(args.html, render_html(report))
         print(json.dumps(report, allow_nan=False, sort_keys=True, separators=(',', ':')))

@@ -53,6 +53,7 @@ jobs:
           ledger-file: examples/ledger_good.csv
           stability-file: examples/stability_demo.csv
           fail-on-warn: 'false'
+          explain: 'true'
           html-report: synthetic-action-report.html
       - name: Check synthetic aliased columns in standalone CLI
         shell: bash
@@ -67,3 +68,4 @@ jobs:
         run: |
           test -s synthetic-action-report.html
           grep -q 'Backtest Doctor' synthetic-action-report.html
+          grep -q 'How to investigate' synthetic-action-report.html
