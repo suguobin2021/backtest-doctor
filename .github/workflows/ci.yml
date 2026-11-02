@@ -36,3 +36,24 @@ jobs:
         run: python -m backtest_doctor --version
       - name: Redacted audit smoke
         run: python -m backtest_doctor ohlcv examples/ohlcv_good.csv
+
+  action-smoke:
+    name: Composite action / synthetic-only smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Run action on safe bundled fixtures
+        uses: ./.github/actions/audit
+        with:
+          ohlcv-file: examples/ohlcv_good.csv
+          ledger-file: examples/ledger_good.csv
+          stability-file: examples/stability_demo.csv
+          fail-on-warn: 'false'
+          html-report: synthetic-action-report.html
+      - name: Assert an offline HTML report was produced
+        shell: bash
+        run: |
+          test -s synthetic-action-report.html
+          grep -q 'Backtest Doctor' synthetic-action-report.html
