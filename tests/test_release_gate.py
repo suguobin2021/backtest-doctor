@@ -54,5 +54,18 @@ class ReleaseGuardTests(unittest.TestCase):
         self.assertEqual(len(gate.EXPECTED_TRACKED), 59)
         self.assertTrue(all(name.startswith('examples/') for name in gate.EXPECTED_TRACKED if name.endswith('.csv')))
 
+    def test_manual_owner_release_gates(self):
+        release = (HERE / '.github/workflows/release-stable.yml').read_text()
+        publisher = (HERE / '.github/workflows/publish-pypi.yml').read_text()
+        for workflow in (release, publisher):
+            self.assertIn('workflow_dispatch:', workflow)
+            self.assertNotIn('\\n  push:', workflow)
+            self.assertIn("github.actor == 'suguobin2021'", workflow)
+            self.assertIn("github.triggering_actor == 'suguobin2021'", workflow)
+        self.assertIn("inputs.confirmation == 'RELEASE'", release)
+        self.assertIn("inputs.confirmation == 'PUBLISH'", publisher)
+        self.assertIn('environment:', publisher)
+        self.assertNotIn('gh workflow run publish-pypi.yml', release)
+
 if __name__ == '__main__':
     unittest.main()
