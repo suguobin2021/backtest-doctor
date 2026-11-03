@@ -1,4 +1,4 @@
-name: Audited stable 0.4.0 release once
+name: Audited stable 0.4.1 release once
 
 on:
   push:
@@ -39,14 +39,14 @@ jobs:
           version = tomllib.loads(Path('pyproject.toml').read_text())['project']['version']
           spec = spec_from_file_location('public_stable_version', 'src/backtest_doctor/__init__.py')
           obj = module_from_spec(spec); spec.loader.exec_module(obj)
-          assert version == '0.4.0' and obj.__version__ == version, 'stable source version mismatch'
+          assert version == '0.4.1' and obj.__version__ == version, 'stable source version mismatch'
           print('STABLE_VERSION_MATCH=PASS')
           PY
-          if gh release view v0.4.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          if gh release view v0.4.1 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo 'Stable release already exists: no re-publish permitted'
             exit 1
           fi
-          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/v0.4.0" >/dev/null 2>&1; then
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/v0.4.1" >/dev/null 2>&1; then
             echo 'Stable tag already exists: refuses to move it'
             exit 1
           fi
@@ -85,11 +85,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gh release create v0.4.0 dist/*.whl dist/*.tar.gz \
+          gh release create v0.4.1 dist/*.whl dist/*.tar.gz \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
-            --title "Backtest Doctor v0.4.0" \
+            --title "Backtest Doctor v0.4.1" \
             --notes "First stable core: offline data and trade-timing audits, synthetic demos, deterministic privacy-minimal JSON/HTML, and fixed diagnostic explanations. Experimental framework CSV adapters remain limited to settled trade summaries and cannot establish strategy causality or profitability. No private data."
           gh workflow run publish-pypi.yml --repo "$GITHUB_REPOSITORY" \
-            --ref v0.4.0 --field confirmation=PUBLISH
+            --ref v0.4.1 --field confirmation=PUBLISH
           echo 'STABLE_GITHUB_RELEASE=CREATED;PYPI_OIDC_REQUESTED=YES'

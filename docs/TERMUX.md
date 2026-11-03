@@ -2,15 +2,15 @@
 
 The owner verified **Android aarch64 Termux / Python 3.13.13** can install and import prerelease 0.4.0rc4. This proves only installation and version reporting, **not** end-to-end Android audit correctness.
 
-When PyPI stable 0.4.0 has been independently verified:
+Stable PyPI is published. Install the default stable package on Termux:
 
 ```sh
 pkg install python git -y
-python -m pip install "backtest-doctor==0.4.0"
+python -m pip install backtest-doctor
 python -m backtest_doctor --version
 ```
 
-Before stable publication, stay with the verified prerelease:
+The historical verified prerelease can still be pinned explicitly:
 
 ```sh
 python -m pip install --pre "backtest-doctor==0.4.0rc4"
