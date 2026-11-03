@@ -21,6 +21,7 @@ EXPECTED_TRACKED = frozenset({
     '.github/workflows/ci.yml',
     '.github/workflows/publish-rc.yml',
     '.github/workflows/publish-pypi.yml',
+    '.github/workflows/release-stable.yml',
     '.gitignore',
     '.github/ISSUE_TEMPLATE/bug_report.md',
     '.github/ISSUE_TEMPLATE/feature_request.md',
