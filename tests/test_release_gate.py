@@ -59,7 +59,7 @@ class ReleaseGuardTests(unittest.TestCase):
         publisher = (HERE / '.github/workflows/publish-pypi.yml').read_text()
         for workflow in (release, publisher):
             self.assertIn('workflow_dispatch:', workflow)
-            self.assertNotIn('\\n  push:', workflow)
+            self.assertNotIn('\n  push:', workflow)
             self.assertIn("github.actor == 'suguobin2021'", workflow)
             self.assertIn("github.triggering_actor == 'suguobin2021'", workflow)
         self.assertIn("inputs.confirmation == 'RELEASE'", release)
