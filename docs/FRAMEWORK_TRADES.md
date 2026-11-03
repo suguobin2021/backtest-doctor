@@ -43,3 +43,5 @@ References to upstream formats:
 - [Vectorbt trade records](https://vectorbt.dev/api/portfolio/trades/)
 - [Freqtrade trade fields](https://www.freqtrade.io/en/stable/advanced-backtesting/)
 - [Freqtrade ZIP output caveat](https://www.freqtrade.io/en/stable/backtesting/)
+
+Additional public-only upstream field review and timezone/export guidance: [Framework compatibility](FRAMEWORK_COMPATIBILITY.md).
