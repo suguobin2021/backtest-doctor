@@ -32,3 +32,11 @@ GitHub publication and PyPI publication are separate milestones. Fail closed: no
 - [x] PyPI wheel/sdist independently checked; installed on Python 3.10 and 3.12.
 - [x] Offline source allowlist + wheel/sdist content gate implemented in `tools/verify_release.py`.
 - [x] Beginner synthetic guide added in `docs/QUICKSTART.md`.
+
+## Stable release readiness (2026-11-03)
+
+- [x] Public upstream backtesting.py / vectorbt / Freqtrade field contracts reviewed, with timezone and fee limitations explicit.
+- [x] Added Termux, reproducible public synthetic showcase and contributor issue templates.
+- [ ] Stable version Git tag + verified GitHub artifacts and PyPI publication completed.
+- [ ] PyPI stable source equivalence and clean Python 3.10/3.12 installs confirmed.
+- [ ] Required-reviewer / protected-tag settings activated by repository administrator; app cannot configure them.

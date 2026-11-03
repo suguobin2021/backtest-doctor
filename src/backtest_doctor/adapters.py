@@ -27,7 +27,7 @@ def audit_imported_trades(rows, framework: str, additional_cost_bps: float = 0):
     """
     if framework not in FORMATS:
         raise ValueError('unsupported framework format')
-    if not isinstance(additional_cost_bps, (int, float)) or not math.isfinite(additional_cost_bps) or additional_cost_bps < 0:
+    if type(additional_cost_bps) not in (int, float) or not math.isfinite(additional_cost_bps) or additional_cost_bps < 0:
         raise ValueError('additional cost must be finite and nonnegative')
     if additional_cost_bps > 10_000:
         raise ValueError('additional cost exceeds 100 percent')

@@ -9,7 +9,7 @@
 
 ## Install
 
-Requires Python 3.10+. The current PyPI distribution is a **prerelease**, not a stable release. Install the verified version explicitly:
+Requires Python 3.10+. The independently verified public package is currently a **prerelease**, not a stable release. Install the verified version explicitly:
 
 ```sh
 python -m pip install --pre "backtest-doctor==0.4.0rc4"
@@ -41,6 +41,8 @@ The intentionally bad ledger produces `FAIL` and exits **1**; this is expected, 
 For a **complete cross-platform, beginner-friendly walkthrough**, follow [the synthetic quickstart](docs/QUICKSTART.md). For the manual, secretless PyPI publishing process, see [the distribution guide](docs/PYPI_PUBLISHING.md).
 
 For CI integration in other repositories, see the [experimental GitHub Action](docs/ACTION_USAGE.md).
+
+Verified public-only [three-framework format guide](docs/FRAMEWORK_COMPATIBILITY.md), [synthetic showcase](docs/SHOWCASE.md), [Android Termux guide](docs/TERMUX.md), and [changelog](CHANGELOG.md).
 
 Add `--explain` to any audit command for **fixed, data-free diagnostic explanations and investigation suggestions**. Explanations are opt-in, preserving the default JSON format. See the [finding guide](docs/FINDING_CODES.md).
 
