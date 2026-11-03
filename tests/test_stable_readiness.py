@@ -24,7 +24,7 @@ class StableCoreReadiness(unittest.TestCase):
 
     def test_version_is_stable_core(self):
         from backtest_doctor import __version__
-        self.assertEqual(__version__, "0.4.0")
+        self.assertEqual(__version__, "0.4.1")
 
     def test_cli_clean_ohlcv(self):
         code, output, _ = self.run_cli("ohlcv", EXAMPLES/"ohlcv_good.csv")

@@ -1,5 +1,10 @@
 # PyPI publishing via Trusted Publisher (no permanent tokens)
 
+## Verified stable distribution
+
+Stable v0.4.0 has been published and independently verified. v0.4.1 is the documentation-correction patch: default user installation uses `python -m pip install backtest-doctor`. No strategy functionality or network behavior changed.
+
+
 ## Verified first publication — 2026-11-03
 
 **Backtest Doctor 0.4.0rc4 is available on PyPI as a prerelease.** It was uploaded from the immutable `v0.4.0rc4` tag using `.github/workflows/publish-pypi.yml` and the `pypi` environment, with GitHub OIDC rather than permanent API keys.
@@ -15,7 +20,7 @@ python -m backtest_doctor --version
 
 Project: https://pypi.org/project/backtest-doctor/0.4.0rc4/
 
-Do **not** claim that a stable `0.4.0` is already available. The framework CSV adapters remain experimental and no real account data or proprietary datasets were used.
+Stable core 0.4.0 is verified; experimental CSV adapters are not native framework integrations. The framework CSV adapters remain experimental and no real account data or proprietary datasets were used.
 
 ## Future releases
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.1 — distribution documentation patch
+
+- Correct installation guides and PyPI project description to show the stable default pip install command.
+- No new runtime functionality, trading rules, network requests, or private data.
+- Preserve immutable v0.4.0 and full audit regression checks.
+
 ## 0.4.0 — stable core release
 
 - Stable **core** offline audits: OHLCV structure, declared trade timing, trade-return cost stress and aggregate JSON/HTML reports.

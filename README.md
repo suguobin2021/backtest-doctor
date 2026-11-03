@@ -9,21 +9,26 @@
 
 ## Install
 
-Requires Python 3.10+. The independently verified public package is currently a **prerelease**, not a stable release. Install the verified version explicitly:
+Requires Python 3.10+. A **stable** release is available on PyPI:
 
 ```sh
-python -m pip install --pre "backtest-doctor==0.4.0rc4"
+python -m pip install backtest-doctor
 python -m backtest_doctor --version
 ```
 
-Alternatively, install from the [audited GitHub Release](https://github.com/suguobin2021/backtest-doctor/releases/tag/v0.4.0rc4) or from this source checkout:
+For reproducibility you can pin the audited documentation patch:
+
+```sh
+python -m pip install "backtest-doctor==0.4.1"
+```
+
+The original stable `0.4.0` remains available and immutable. Installation from checked-out public source is also supported:
 
 ```sh
 python -m pip install .
-python -m backtest_doctor --help
 ```
 
-[PyPI project](https://pypi.org/project/backtest-doctor/0.4.0rc4/) · [Distribution guidance](docs/PYPI_PUBLISHING.md).
+[PyPI project](https://pypi.org/project/backtest-doctor/) · [Quickstart](docs/QUICKSTART.md) · [Version history](CHANGELOG.md).
 
 ## 30-second synthetic demo
 

@@ -16,7 +16,7 @@ python3 -m venv .venv
 
 On Windows PowerShell, replace `python3` with `py -3` and each `.venv/bin/python` with `.venv/Scripts/python.exe`. Do not upload your own CSV files to a third-party service to try this demo.
 
-A versioned GitHub Release wheel is also available; PyPI installation is not advertised until an actual published PyPI package has been verified.
+Install from stable PyPI with `python -m pip install backtest-doctor`; version pinning `backtest-doctor==0.4.1` is recommended for reproducibility.
 
 ## 2. Pass an OHLCV structure check
 

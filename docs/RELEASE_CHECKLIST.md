@@ -37,6 +37,11 @@ GitHub publication and PyPI publication are separate milestones. Fail closed: no
 
 - [x] Public upstream backtesting.py / vectorbt / Freqtrade field contracts reviewed, with timezone and fee limitations explicit.
 - [x] Added Termux, reproducible public synthetic showcase and contributor issue templates.
-- [ ] Stable version Git tag + verified GitHub artifacts and PyPI publication completed.
-- [ ] PyPI stable source equivalence and clean Python 3.10/3.12 installs confirmed.
+- [x] Stable 0.4.0 GitHub tag, artifacts and PyPI publication completed.
+- [x] PyPI 0.4.0 source equivalence and independent Python 3.10 install verified; Python 3.12 covered by official CI; independent PyPI 3.12 install remains follow-up.
 - [ ] Required-reviewer / protected-tag settings activated by repository administrator; app cannot configure them.
+
+## 0.4.1 documentation correction
+
+- [x] Stable default pip command documented.
+- [ ] v0.4.1 tag, PyPI upload, and independent artifact checks completed.
