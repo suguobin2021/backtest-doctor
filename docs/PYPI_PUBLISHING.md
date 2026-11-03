@@ -2,7 +2,7 @@
 
 ## Verified stable distribution
 
-Stable v0.4.0 has been published and independently verified. v0.4.1 is the documentation-correction patch: default user installation uses `python -m pip install backtest-doctor`. No strategy functionality or network behavior changed.
+Stable v0.4.0 and documentation-correction v0.4.1 have both been published and independently verified. v0.4.1 is the patch that: default user installation uses `python -m pip install backtest-doctor`. No strategy functionality or network behavior changed.
 
 
 ## Verified first publication — 2026-11-03
@@ -36,3 +36,5 @@ Official docs:
 - https://docs.pypi.org/trusted-publishers/using-a-publisher/
 - https://docs.pypi.org/trusted-publishers/creating-a-project-through-oidc/
 - https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
+
+The latest 0.4.1 stable wheel and sdist are publicly indexed; their hashes and source contents have been independently verified. Ordinary unpinned `pip install backtest-doctor` resolves to 0.4.1. The exact immutable release is https://github.com/suguobin2021/backtest-doctor/releases/tag/v0.4.1 .

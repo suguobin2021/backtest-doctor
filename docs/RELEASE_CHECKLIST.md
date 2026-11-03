@@ -44,4 +44,9 @@ GitHub publication and PyPI publication are separate milestones. Fail closed: no
 ## 0.4.1 documentation correction
 
 - [x] Stable default pip command documented.
-- [ ] v0.4.1 tag, PyPI upload, and independent artifact checks completed.
+- [x] v0.4.1 immutable GitHub tag and PyPI upload completed, and both published artifacts independently matched audited source and PyPI SHA256.
+
+## Remaining account-bound controls
+
+- [ ] GitHub owner enables enforceable main branch protection and pypi Environment review; tracked in [Issue #14](https://github.com/suguobin2021/backtest-doctor/issues/14). This connector lacks administration-write access.
+- [ ] Organic community growth / external directory decision; tracked in [Issue #15](https://github.com/suguobin2021/backtest-doctor/issues/15).
