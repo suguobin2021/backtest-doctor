@@ -38,3 +38,12 @@ Official docs:
 - https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
 
 The latest 0.4.1 stable wheel and sdist are publicly indexed; their hashes and source contents have been independently verified. Ordinary unpinned `pip install backtest-doctor` resolves to 0.4.1. The exact immutable release is https://github.com/suguobin2021/backtest-doctor/releases/tag/v0.4.1 .
+
+
+## Owner-gated manual release process (2026-11-03)
+
+The stable GitHub release workflow now requires **manual workflow_dispatch by the repository owner**; ordinary pushes do not trigger new releases. Run `DRY_RUN` on a reviewed new stable version with green exact-commit CI, then select `RELEASE` to create its immutable GitHub tag and assets. It does **not** automatically send anything to PyPI.
+
+The PyPI OIDC workflow separately requires that both the original triggering actor and a rerun actor are the repository owner. Select the newly created version tag, use `DRY_RUN`, inspect checks, and then explicitly run `PUBLISH`.
+
+These application-level checks reduce accidental and unauthorized releases, but **do not replace GitHub-enforced main branch rulesets, protected tags, or `pypi` Environment required-reviewer protection**. Those require repository owner account Settings and remain tracked in [Issue #14](https://github.com/suguobin2021/backtest-doctor/issues/14).

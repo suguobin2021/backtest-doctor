@@ -16,7 +16,7 @@ jobs:
   verify:
     name: Build and verify tag-matched source
     runs-on: ubuntu-latest
-    if: ${{ inputs.confirmation == 'DRY_RUN' || inputs.confirmation == 'PUBLISH' }}
+    if: ${{ github.repository == 'suguobin2021/backtest-doctor' && github.actor == 'suguobin2021' && github.triggering_actor == 'suguobin2021' && (inputs.confirmation == 'DRY_RUN' || inputs.confirmation == 'PUBLISH') }}
     outputs:
       version: ${{ steps.version.outputs.version }}
     steps:
@@ -62,7 +62,7 @@ jobs:
   publish:
     name: Publish to PyPI using OIDC
     needs: verify
-    if: ${{ inputs.confirmation == 'PUBLISH' }}
+    if: ${{ github.repository == 'suguobin2021/backtest-doctor' && github.actor == 'suguobin2021' && github.triggering_actor == 'suguobin2021' && inputs.confirmation == 'PUBLISH' }}
     runs-on: ubuntu-latest
     environment:
       name: pypi

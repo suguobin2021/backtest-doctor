@@ -1,22 +1,26 @@
-name: Audited stable 0.4.1 release once
+name: Audited stable release (owner-triggered)
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/release-stable.yml
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: 'Type RELEASE to approve a new stable GitHub release; DRY_RUN for checks only'
+        required: true
+        default: 'DRY_RUN'
+        type: string
 
 permissions:
   contents: read
 
 jobs:
   stable-release:
-    name: Publish audited stable GitHub artifacts and request PyPI OIDC
+    name: Review exact main commit and release only on explicit owner approval
+    if: ${{ github.repository == 'suguobin2021/backtest-doctor' && github.actor == 'suguobin2021' && github.triggering_actor == 'suguobin2021' && (inputs.confirmation == 'RELEASE' || inputs.confirmation == 'DRY_RUN') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
       contents: write
-      actions: write
+      actions: read
     steps:
       - uses: actions/checkout@v4
         with:
@@ -39,14 +43,16 @@ jobs:
           version = tomllib.loads(Path('pyproject.toml').read_text())['project']['version']
           spec = spec_from_file_location('public_stable_version', 'src/backtest_doctor/__init__.py')
           obj = module_from_spec(spec); spec.loader.exec_module(obj)
-          assert version == '0.4.1' and obj.__version__ == version, 'stable source version mismatch'
+          import re
+          assert re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+', version) and obj.__version__ == version, 'stable source version mismatch'
           print('STABLE_VERSION_MATCH=PASS')
           PY
-          if gh release view v0.4.1 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          version="$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')"
+          if gh release view "v$version" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo 'Stable release already exists: no re-publish permitted'
             exit 1
           fi
-          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/v0.4.1" >/dev/null 2>&1; then
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/v$version" >/dev/null 2>&1; then
             echo 'Stable tag already exists: refuses to move it'
             exit 1
           fi
@@ -79,17 +85,18 @@ jobs:
           python -m backtest_doctor ohlcv examples/ohlcv_good.csv
           python -m backtest_doctor import-trades examples/vectorbt_synthetic.csv --framework vectorbt --explain
           sha256sum dist/*
-      - name: Create immutable GitHub stable release then dispatch trusted PyPI workflow
+      - name: Create immutable GitHub stable release after owner approval
+        if: ${{ inputs.confirmation == 'RELEASE' }}
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          gh release create v0.4.1 dist/*.whl dist/*.tar.gz \
+          version="$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')"
+          tag="v$version"
+          gh release create "$tag" dist/*.whl dist/*.tar.gz \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
-            --title "Backtest Doctor v0.4.1" \
+            --title "Backtest Doctor $tag" \
             --notes "First stable core: offline data and trade-timing audits, synthetic demos, deterministic privacy-minimal JSON/HTML, and fixed diagnostic explanations. Experimental framework CSV adapters remain limited to settled trade summaries and cannot establish strategy causality or profitability. No private data."
-          gh workflow run publish-pypi.yml --repo "$GITHUB_REPOSITORY" \
-            --ref v0.4.1 --field confirmation=PUBLISH
-          echo 'STABLE_GITHUB_RELEASE=CREATED;PYPI_OIDC_REQUESTED=YES'
+          echo 'STABLE_GITHUB_RELEASE=CREATED;PYPI_UPLOAD_REQUIRES_SEPARATE_OWNER_APPROVAL'
