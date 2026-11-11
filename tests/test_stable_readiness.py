@@ -114,6 +114,22 @@ class StableCoreReadiness(unittest.TestCase):
         for name in ("ledger_bad.csv","ohlcv_good.csv","ohlcv_bad.csv","stability_demo.csv"):
             self.assertTrue((EXAMPLES/name).is_file())
 
+    def test_public_no_clone_demo_is_pinned_and_data_free(self):
+        docs = (ROOT / "docs/QUICKSTART.md").read_text()
+        home = (ROOT / "README.md").read_text()
+        for value in (
+            "backtest-doctor==0.4.1",
+            "https://raw.githubusercontent.com/suguobin2021/backtest-doctor/v0.4.1/examples/",
+            "synthetic_ohlcv.csv",
+            "synthetic_bad_ledger.csv",
+        ):
+            self.assertIn(value, docs)
+            self.assertIn(value, home)
+        self.assertIn('rows_examined', docs)
+        self.assertIn('offline', docs.lower())
+        self.assertNotIn('curl |', docs)
+        self.assertNotIn('curl |', home)
+
     def test_framework_guide_disclaims_engine_validation(self):
         text=(ROOT/"docs/FRAMEWORK_COMPATIBILITY.md").read_text()
         self.assertIn("experimental",text)

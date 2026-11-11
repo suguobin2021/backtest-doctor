@@ -2,6 +2,10 @@
 
 Backtest Doctor checks evidence structure, **not** strategy alpha. All fixtures are invented and suitable for public sharing.
 
+## From a clean PyPI install (no clone)
+
+See [the pinned public-fixture Quickstart](QUICKSTART.md) for a one-line download followed by the actual CLI. This entry path works without Git or local private market data, and was independently run with the `0.4.1` wheel.
+
 ## Bad candle and clean candle
 
 ```sh
