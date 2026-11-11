@@ -30,6 +30,27 @@ python -m pip install .
 
 [PyPI project](https://pypi.org/project/backtest-doctor/) · [Quickstart](docs/QUICKSTART.md) · [Version history](CHANGELOG.md).
 
+## Try it without Git or private data
+
+After installing from PyPI, copy these commands into a terminal (Python 3.10+; works in Windows PowerShell, macOS/Linux, or Android Termux with `python` available):
+
+```sh
+python -m pip install "backtest-doctor==0.4.1"
+python -c "from urllib.request import urlretrieve; urlretrieve('https://raw.githubusercontent.com/suguobin2021/backtest-doctor/v0.4.1/examples/ohlcv_good.csv', 'synthetic_ohlcv.csv')"
+python -m backtest_doctor ohlcv synthetic_ohlcv.csv --explain
+```
+
+**Expected:** JSON with `"status": "PASS"`, 3 synthetic candle rows and exit code `0`. This exact flow was run in an isolated Python environment on 2026-11-11. It downloads only a public fixture from the immutable `v0.4.1` GitHub tag; **the audit itself is offline** and never transmits CSV contents. No API keys or trading-account files are needed.
+
+To see a real diagnostic on **deliberately fabricated** timing errors:
+
+```sh
+python -c "from urllib.request import urlretrieve; urlretrieve('https://raw.githubusercontent.com/suguobin2021/backtest-doctor/v0.4.1/examples/ledger_bad.csv', 'synthetic_bad_ledger.csv')"
+python -m backtest_doctor ledger synthetic_bad_ledger.csv --explain
+```
+
+Here `"status": "FAIL"` with three explanatory findings and exit code `1` are **expected**. This is a negative test, not a broken installation. The same pinned-fixture tutorial and Windows notes are in [Quickstart](docs/QUICKSTART.md).
+
 ## 30-second synthetic demo
 
 ```sh
